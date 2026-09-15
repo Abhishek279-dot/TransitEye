@@ -1,0 +1,203 @@
+import { Incident } from '../types';
+
+export const mockIncidents: Incident[] = [
+  {
+    id: "INC-2026-001",
+    event_type: "pothole",
+    confidence: 0.94,
+    latitude: 18.5314,
+    longitude: 73.8446,
+    timestamp: "2026-09-12T08:14:22",
+    bus_id: "PMPML-102",
+    status: "Detected",
+    plate_number: null,
+    location_name: "FC Road, near Fergusson College",
+    notes: "Deep asphalt cavity detected in left transit lane"
+  },
+
+
+  {
+    id: "INC-2026-002",
+    event_type: "waterlogging",
+    confidence: 0.89,
+    latitude: 18.5018,
+    longitude: 73.8636,
+    timestamp: "2026-09-12T07:45:10",
+    bus_id: "PMPML-108",
+    status: "Verified",
+    plate_number: null,
+    location_name: "Swargate Underpass Junction",
+    notes: "Surface runoff accumulation obstructing bus bay entry"
+  },
+
+  {
+    id: "INC-2026-003",
+    event_type: "traffic_congestion",
+    confidence: 0.96,
+    latitude: 18.5284,
+    longitude: 73.8743,
+    timestamp: "2026-09-12T09:20:05",
+    bus_id: "PMPML-214",
+    status: "Action Taken",
+    plate_number: null,
+    location_name: "Pune Station Approach, Alankar Chowk",
+    notes: "Traffic queue length > 180m, ByteTrack vehicle count high"
+  },
+  {
+    id: "INC-2026-004",
+    event_type: "unsafe_pedestrian",
+    confidence: 0.87,
+    latitude: 18.5204,
+    longitude: 73.8567,
+    timestamp: "2026-09-12T08:55:40",
+    bus_id: "PMPML-102",
+    status: "Detected",
+    plate_number: null,
+    location_name: "Deccan Gymkhana, Sambhaji Bridge entry",
+    notes: "Pedestrians crossing through median opening without refuge"
+  },
+  {
+    id: "INC-2026-005",
+    event_type: "hit_and_run",
+    confidence: 0.92,
+    latitude: 18.5590,
+    longitude: 73.7868,
+    timestamp: "2026-09-11T18:42:15",
+    bus_id: "PMPML-305",
+    status: "Assigned",
+    plate_number: "MH12-QB-8492",
+    location_name: "Hinjewadi Phase 1, Shivaji Chowk",
+    notes: "Vehicle collision with curb barricade followed by departure"
+  },
+  {
+    id: "INC-2026-006",
+    event_type: "traffic_sign_issue",
+    confidence: 0.91,
+    latitude: 18.5089,
+    longitude: 73.8077,
+    timestamp: "2026-09-11T14:15:30",
+    bus_id: "PMPML-142",
+    status: "Resolved",
+    plate_number: null,
+    location_name: "Kothrud Depot, Karve Road",
+    notes: "Damaged 'One Way' directional signboard bent at 45 degrees"
+  },
+  {
+    id: "INC-2026-007",
+    event_type: "pothole",
+    confidence: 0.88,
+    latitude: 18.5679,
+    longitude: 73.9143,
+    timestamp: "2026-09-12T06:30:18",
+    bus_id: "PMPML-189",
+    status: "Verified",
+    plate_number: null,
+    location_name: "Viman Nagar, Phoenix Mall arterial road",
+    notes: "Surface wear with exposed aggregate after rain"
+  },
+  
+  {
+    id: "INC-2026-008",
+    event_type: "traffic_congestion",
+    confidence: 0.95,
+    latitude: 18.5034,
+    longitude: 73.9272,
+    timestamp: "2026-09-12T09:40:00",
+    bus_id: "PMPML-220",
+    status: "Detected",
+    plate_number: null,
+    location_name: "Hadapsar Gadital Flyover merge",
+    notes: "Dense bottleneck on Pune-Solapur Highway section"
+  },
+  {
+    id: "INC-2026-009",
+    event_type: "pothole",
+    confidence: 0.82,
+    latitude: 18.4575,
+    longitude: 73.8677,
+    timestamp: "2026-09-10T11:12:44",
+    bus_id: "PMPML-115",
+    status: "Assigned",
+    plate_number: null,
+    location_name: "Katraj Ghat Road, near Snake Park",
+    notes: "Clusters of road cratering on uphill gradient"
+  },
+  {
+    id: "INC-2026-010",
+    event_type: "traffic_sign_issue",
+    confidence: 0.90,
+    latitude: 18.5362,
+    longitude: 73.8310,
+    timestamp: "2026-09-11T16:05:12",
+    bus_id: "PMPML-102",
+    status: "Verified",
+    plate_number: null,
+    location_name: "Pune University Circle, Ganeshkhind Road",
+    notes: "Obscured speed limit sign due to low hanging tree branch"
+  },
+  {
+    id: "INC-2026-011",
+    event_type: "waterlogging",
+    confidence: 0.93,
+    latitude: 18.5445,
+    longitude: 73.8821,
+    timestamp: "2026-09-12T07:10:00",
+    bus_id: "PMPML-177",
+    status: "Assigned",
+    plate_number: null,
+    location_name: "Kalyani Nagar Bridge approach",
+    notes: "Stormwater drain choked, 15cm standing pool on curb"
+  },
+  {
+    id: "INC-2026-012",
+    event_type: "unsafe_pedestrian",
+    confidence: 0.85,
+    latitude: 18.5158,
+    longitude: 73.8560,
+    timestamp: "2026-09-12T09:05:33",
+    bus_id: "PMPML-108",
+    status: "Detected",
+    plate_number: null,
+    location_name: "Laxmi Road, City Market zone",
+    notes: "High pedestrian encroachment on carriageway during market hours"
+  },
+  {
+    id: "INC-2026-013",
+    event_type: "hit_and_run",
+    confidence: 0.95,
+    latitude: 18.4967,
+    longitude: 73.8504,
+    timestamp: "2026-09-09T21:14:02",
+    bus_id: "PMPML-142",
+    status: "Resolved",
+    plate_number: "MH14-DT-3910",
+    location_name: "Parvati Paytha intersection",
+    notes: "Two-wheeler struck stationary signage board and left scene"
+  },
+  {
+    id: "INC-2026-014",
+    event_type: "traffic_congestion",
+    confidence: 0.91,
+    latitude: 18.5793,
+    longitude: 73.7438,
+    timestamp: "2026-09-12T08:35:19",
+    bus_id: "PMPML-305",
+    status: "Detected",
+    plate_number: null,
+    location_name: "Wakad Bridge / Bangalore Highway junction",
+    notes: "Heavy volume slowdown entering IT corridor"
+  },
+  {
+    id: "INC-2026-015",
+    event_type: "pothole",
+    confidence: 0.97,
+    latitude: 18.5308,
+    longitude: 73.8474,
+    timestamp: "2026-09-12T08:02:11",
+    bus_id: "PMPML-102",
+    status: "Action Taken",
+    plate_number: null,
+    location_name: "Modern College Chowk, Shivajinagar",
+    notes: "Critical trench cut pothole, cold mix repair underway"
+  }
+];

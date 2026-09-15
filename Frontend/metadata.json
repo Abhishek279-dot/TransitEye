@@ -1,0 +1,6 @@
+{
+  "name": "Bharat RakshaMarg",
+  "description": "AI-Powered Mobile Urban Intelligence Platform Using Public Transport Fleet - GIS monitoring dashboard for transport authorities.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
