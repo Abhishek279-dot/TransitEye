@@ -1,11 +1,23 @@
+# Node
 node_modules/
+Frontend/node_modules/
+
+# Build
 build/
 dist/
 coverage/
+
+# Python
+**/__pycache__/
+**/*.pyc
+backend/venv/
+
+# OS
 .DS_Store
+
+# Logs
 *.log
+
+# Environment variables
 .env*
 !.env.example
-
-backend/venv/
-Frontend/node_modules/
