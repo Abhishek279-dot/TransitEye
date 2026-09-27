@@ -1,5 +1,12 @@
-import React from 'react';
-import { Filter, RotateCcw, Calendar, Gauge, Info, AlertCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import {
+  Filter,
+  RotateCcw,
+  Calendar,
+  Gauge,
+  AlertCircle,
+  ChevronDown,
+} from 'lucide-react';
 import { EventType, IncidentStatus, FilterState } from '../types';
 import { EVENT_TYPE_CONFIG, COMING_SOON_EVENT_TYPES, STATUS_CONFIG } from '../utils/constants';
 
@@ -10,6 +17,42 @@ interface SidebarFiltersProps {
   totalCount: number;
   filteredCount: number;
 }
+
+// Local, presentation-only collapsible wrapper — no external state involved
+const FilterSection: React.FC<{
+  icon: React.ReactNode;
+  title: string;
+  summary?: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}> = ({ icon, title, summary, defaultOpen = false, children }) => {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="pt-3 border-t border-slate-200 first:border-t-0 first:pt-0">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between group"
+      >
+        <span className="flex items-center gap-1.5">
+          {icon}
+          <span className="text-xs font-bold text-slate-800 uppercase tracking-wide">
+            {title}
+          </span>
+        </span>
+        <span className="flex items-center gap-1.5">
+          {!open && summary && (
+            <span className="text-[11px] text-slate-500 font-medium">{summary}</span>
+          )}
+          <ChevronDown
+            className={`w-3.5 h-3.5 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`}
+          />
+        </span>
+      </button>
+      {open && <div className="mt-2.5">{children}</div>}
+    </div>
+  );
+};
 
 export const SidebarFilters: React.FC<SidebarFiltersProps> = ({
   filters,
@@ -59,8 +102,13 @@ export const SidebarFilters: React.FC<SidebarFiltersProps> = ({
     onFilterChange({ ...filters, [key]: value });
   };
 
+  const dateRangeSummary =
+    filters.dateFrom || filters.dateTo
+      ? `${filters.dateFrom || 'Any'} → ${filters.dateTo || 'Any'}`
+      : 'All dates';
+
   return (
-    <aside 
+    <aside
       id="sidebar-filters-panel"
       className="w-full lg:w-80 bg-white border-r border-slate-200 flex flex-col h-full overflow-y-auto shrink-0 shadow-sm"
     >
@@ -91,100 +139,67 @@ export const SidebarFilters: React.FC<SidebarFiltersProps> = ({
         </span>
       </div>
 
-      <div className="p-4 space-y-6 flex-1">
+      <div className="p-4 space-y-0 flex-1">
         {/* 1. EVENT TYPES */}
-        <div>
-          <div className="flex items-center justify-between mb-2.5">
-            <span className="text-xs font-bold text-slate-800 uppercase tracking-wide">
-              Event Types
-            </span>
-            <span className="text-[11px] text-slate-500">
-              {filters.eventTypes.length} selected
-            </span>
-          </div>
-
-          {/* ACTIVE GROUP */}
-          <div className="mb-3">
-            <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              Active Detections
-            </div>
-            <div className="space-y-1.5">
-              {activeEventTypes.map((typeKey) => {
-                const config = EVENT_TYPE_CONFIG[typeKey];
-                const isChecked = filters.eventTypes.includes(typeKey);
-                return (
-                  <label
-                    key={typeKey}
-                    id={`filter-event-${typeKey}`}
-                    className={`flex items-center justify-between p-2 rounded-md border text-xs cursor-pointer transition-colors ${
-                      isChecked
-                        ? 'bg-slate-50 border-slate-300 text-slate-900'
-                        : 'bg-white border-transparent text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2.5">
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={() => toggleEventType(typeKey)}
-                        className="rounded border-slate-300 text-[#0B1E36] focus:ring-slate-400 h-4 w-4"
-                      />
-                      <span className="flex items-center gap-2 font-medium">
-                        <span
-                          className="w-2.5 h-2.5 rounded-full shrink-0 shadow-xs"
-                          style={{ backgroundColor: config.color }}
-                        />
-                        {config.label}
-                      </span>
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* COMING SOON GROUP */}
-          <div className="pt-2 border-t border-dashed border-slate-200">
-            <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-              <Info className="w-3 h-3 text-slate-400" />
-              Future Capabilities (Coming Soon)
-            </div>
-            <div className="space-y-1.5">
-              {COMING_SOON_EVENT_TYPES.map((item) => (
-                <div
-                  key={item.label}
-                  className="flex items-center justify-between p-2 rounded-md bg-slate-50/80 border border-slate-200/80 text-xs opacity-60 cursor-not-allowed select-none"
-                  title={`${item.label}: ${item.reason}`}
+        <FilterSection
+          icon={<span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
+          title="Event Types"
+          summary={`${filters.eventTypes.length} selected`}
+          defaultOpen
+        >
+          <div className="space-y-1">
+            {activeEventTypes.map((typeKey) => {
+              const config = EVENT_TYPE_CONFIG[typeKey];
+              const isChecked = filters.eventTypes.includes(typeKey);
+              return (
+                <label
+                  key={typeKey}
+                  id={`filter-event-${typeKey}`}
+                  className={`flex items-center gap-2.5 px-2 py-1.5 rounded-md text-xs cursor-pointer transition-colors ${
+                    isChecked ? 'bg-slate-50 text-slate-900' : 'text-slate-600 hover:bg-slate-50'
+                  }`}
                 >
-                  <div className="flex items-center space-x-2.5">
-                    <input
-                      type="checkbox"
-                      disabled
-                      checked={false}
-                      className="rounded border-slate-300 bg-slate-200 text-slate-400 h-4 w-4 cursor-not-allowed"
-                    />
-                    <span className="font-normal text-slate-500 line-through decoration-slate-300">
-                      {item.label}
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-medium bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded">
-                    Coming Soon
-                  </span>
-                </div>
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => toggleEventType(typeKey)}
+                    className="rounded border-slate-300 text-[#0B1E36] focus:ring-slate-400 h-3.5 w-3.5"
+                  />
+                  <span
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ backgroundColor: config.color }}
+                  />
+                  <span className="font-medium">{config.label}</span>
+                </label>
+              );
+            })}
+          </div>
+
+          {/* Coming soon — compact chip row, not full boxes */}
+          <div className="mt-3 pt-2.5 border-t border-dashed border-slate-200">
+            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+              Coming soon
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {COMING_SOON_EVENT_TYPES.map((item) => (
+                <span
+                  key={item.label}
+                  title={item.reason}
+                  className="text-[10px] font-medium text-slate-400 bg-slate-100 px-2 py-1 rounded-full cursor-not-allowed select-none"
+                >
+                  {item.label}
+                </span>
               ))}
             </div>
           </div>
-        </div>
+        </FilterSection>
 
         {/* 2. DATE RANGE PICKER */}
-        <div className="pt-3 border-t border-slate-200">
-          <div className="flex items-center gap-1.5 mb-2.5">
-            <Calendar className="w-3.5 h-3.5 text-slate-600" />
-            <span className="text-xs font-bold text-slate-800 uppercase tracking-wide">
-              Date Range
-            </span>
-          </div>
+        <FilterSection
+          icon={<Calendar className="w-3.5 h-3.5 text-slate-600" />}
+          title="Date Range"
+          summary={dateRangeSummary}
+        >
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label htmlFor="filter-date-from" className="block text-[11px] text-slate-500 font-medium mb-1">
@@ -211,24 +226,14 @@ export const SidebarFilters: React.FC<SidebarFiltersProps> = ({
               />
             </div>
           </div>
-        </div>
+        </FilterSection>
 
         {/* 3. MINIMUM CONFIDENCE SLIDER */}
-        <div className="pt-3 border-t border-slate-200">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-1.5">
-              <Gauge className="w-3.5 h-3.5 text-slate-600" />
-              <span className="text-xs font-bold text-slate-800 uppercase tracking-wide">
-                Min. AI Confidence
-              </span>
-            </div>
-            <span 
-              id="confidence-display-badge"
-              className="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-[#0B1E36] border border-slate-200"
-            >
-              {Math.round(filters.minConfidence * 100)}%
-            </span>
-          </div>
+        <FilterSection
+          icon={<Gauge className="w-3.5 h-3.5 text-slate-600" />}
+          title="Min. AI Confidence"
+          summary={`${Math.round(filters.minConfidence * 100)}%`}
+        >
           <input
             id="confidence-slider"
             type="range"
@@ -242,22 +247,17 @@ export const SidebarFilters: React.FC<SidebarFiltersProps> = ({
           <div className="flex justify-between text-[10px] text-slate-400 mt-1">
             <span>0%</span>
             <span>50%</span>
-            <span>80% (Recommended)</span>
             <span>100%</span>
           </div>
-        </div>
+        </FilterSection>
 
         {/* 4. INCIDENT STATUS CHECKBOXES */}
-        <div className="pt-3 border-t border-slate-200">
-          <div className="flex items-center justify-between mb-2.5">
-            <span className="text-xs font-bold text-slate-800 uppercase tracking-wide">
-              Incident Status
-            </span>
-            <span className="text-[11px] text-slate-500">
-              {filters.statuses.length} selected
-            </span>
-          </div>
-          <div className="space-y-1.5">
+        <FilterSection
+          icon={<span className="w-1.5 h-1.5 rounded-full bg-slate-400" />}
+          title="Incident Status"
+          summary={`${filters.statuses.length} selected`}
+        >
+          <div className="space-y-1">
             {allStatuses.map((status) => {
               const statusCfg = STATUS_CONFIG[status];
               const isChecked = filters.statuses.includes(status);
@@ -265,35 +265,26 @@ export const SidebarFilters: React.FC<SidebarFiltersProps> = ({
                 <label
                   key={status}
                   id={`filter-status-${status.replace(/\s+/g, '-').toLowerCase()}`}
-                  className={`flex items-center justify-between p-2 rounded-md border text-xs cursor-pointer transition-colors ${
-                    isChecked
-                      ? 'bg-slate-50 border-slate-300 text-slate-900'
-                      : 'bg-white border-transparent text-slate-600 hover:bg-slate-50'
+                  className={`flex items-center gap-2.5 px-2 py-1.5 rounded-md text-xs cursor-pointer transition-colors ${
+                    isChecked ? 'bg-slate-50 text-slate-900' : 'text-slate-600 hover:bg-slate-50'
                   }`}
                 >
-                  <div className="flex items-center space-x-2.5">
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => toggleStatus(status)}
-                      className="rounded border-slate-300 text-[#0B1E36] focus:ring-slate-400 h-4 w-4"
-                    />
-                    <span className="font-medium text-slate-800">{status}</span>
-                  </div>
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => toggleStatus(status)}
+                    className="rounded border-slate-300 text-[#0B1E36] focus:ring-slate-400 h-3.5 w-3.5"
+                  />
                   <span
-                    className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
-                    style={{
-                      backgroundColor: statusCfg.bg,
-                      color: statusCfg.text,
-                    }}
-                  >
-                    {status}
-                  </span>
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ backgroundColor: statusCfg.text }}
+                  />
+                  <span className="font-medium">{status}</span>
                 </label>
               );
             })}
           </div>
-        </div>
+        </FilterSection>
       </div>
 
       {/* Footer Info */}

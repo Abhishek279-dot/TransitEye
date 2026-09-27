@@ -23,6 +23,7 @@ export interface Incident {
   status: IncidentStatus;
   plate_number: string | null;
   timestamp: string;
+  image_url?: string;   
 }
 
 export interface Bus {

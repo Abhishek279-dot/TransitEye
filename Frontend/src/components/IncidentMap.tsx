@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Incident } from '../types';
 import { EVENT_TYPE_CONFIG, STATUS_CONFIG } from '../utils/constants';
-import { Bus, Calendar, Activity, Navigation, LocateFixed } from 'lucide-react';
+import { Bus, Calendar, Activity, Navigation, LocateFixed, ImageIcon, X } from 'lucide-react';
 
 interface IncidentMapProps {
   incidents: Incident[];
@@ -12,7 +12,7 @@ interface IncidentMapProps {
 }
 
 // Helper component to smoothly fly to selected incident
-const FlyToController: React.FC<{ 
+const FlyToController: React.FC<{
   targetIncident?: Incident | null;
   onMapReady?: (map: L.Map) => void;
 }> = ({ targetIncident, onMapReady }) => {
@@ -65,6 +65,7 @@ export const IncidentMap: React.FC<IncidentMapProps> = ({
   const defaultCenter: [number, number] = [18.5204, 73.8567]; // Pune
   const defaultZoom = 12;
   const [mapInstance, setMapInstance] = React.useState<L.Map | null>(null);
+  const [photoIncident, setPhotoIncident] = useState<Incident | null>(null);
 
   // Memoize icons by event type
   const iconMap = useMemo(() => {
@@ -130,8 +131,8 @@ export const IncidentMap: React.FC<IncidentMapProps> = ({
           maxZoom={19}
         />
 
-        <FlyToController 
-          targetIncident={selectedIncident} 
+        <FlyToController
+          targetIncident={selectedIncident}
           onMapReady={setMapInstance}
         />
 
@@ -160,7 +161,6 @@ export const IncidentMap: React.FC<IncidentMapProps> = ({
                   if (onSelectIncident) {
                     onSelectIncident(incident);
                   }
-                  // Animated FlyTo centering the map on the selected incident location with smooth zoom
                   const map = e.target._map;
                   if (map && typeof map.flyTo === 'function') {
                     map.flyTo([incident.latitude, incident.longitude], 16, {
@@ -171,94 +171,97 @@ export const IncidentMap: React.FC<IncidentMapProps> = ({
                 },
               }}
             >
-              <Popup className="custom-incident-popup" maxWidth={320}>
-                <div className="p-1 font-sans text-slate-800">
-                  {/* Header with Type & Status */}
-                  <div className="flex items-start justify-between gap-2 border-b border-slate-200 pb-2 mb-2">
-                    <div className="flex items-center gap-1.5">
-                      <span
-                        className="w-2.5 h-2.5 rounded-full shrink-0"
-                        style={{ backgroundColor: config.color }}
-                      />
-                      <span className="font-bold text-sm text-slate-900 leading-tight">
-                        {config.label}
-                      </span>
-                    </div>
+              <Popup className="custom-incident-popup" maxWidth={300}>
+                <div className="font-sans text-slate-800 w-[268px] -m-1">
+                  {/* Colored accent header strip */}
+                  <div
+                    className="flex items-center justify-between px-3 py-2.5 rounded-t-lg"
+                    style={{ backgroundColor: config.color }}
+                  >
+                    <span className="font-bold text-[13.5px] text-white leading-tight">
+                      {config.label}
+                    </span>
                     <span
-                      className="text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0"
-                      style={{
-                        backgroundColor: statusConfig.bg,
-                        color: statusConfig.text,
-                      }}
+                      className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/90 shrink-0"
+                      style={{ color: statusConfig.text }}
                     >
                       {incident.status}
                     </span>
                   </div>
 
-                  {/* Incident Location / Notes */}
-                  {incident.location_name && (
-                    <p className="text-xs font-medium text-slate-700 mb-1 flex items-center gap-1">
-                      <Navigation className="w-3 h-3 text-slate-400 shrink-0" />
-                      {incident.location_name}
-                    </p>
-                  )}
+                  <div className="px-3 py-2.5">
+                    {/* Location */}
+                    {incident.location_name && (
+                      <p className="text-[12.5px] font-semibold text-slate-800 flex items-center gap-1.5 mb-1.5">
+                        <Navigation className="w-3.5 h-3.5 shrink-0" style={{ color: config.color }} />
+                        {incident.location_name}
+                      </p>
+                    )}
 
-                  {incident.notes && (
-                    <p className="text-[11px] text-slate-500 italic mb-2.5 bg-slate-50 p-1.5 rounded border border-slate-150">
-                      "{incident.notes}"
-                    </p>
-                  )}
+                    {/* Notes */}
+                    {incident.notes && (
+                      <p className="text-[11px] text-slate-500 italic mb-2.5 leading-snug">
+                        "{incident.notes}"
+                      </p>
+                    )}
 
-                  {/* Telemetry Details Grid */}
-                  <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-50/80 p-2 rounded border border-slate-200 mb-2">
-                    <div>
-                      <span className="text-slate-500 block text-[10px] uppercase font-semibold">
-                        AI Confidence
-                      </span>
-                      <div className="flex items-center gap-1 mt-0.5 font-bold text-slate-800">
-                        <Activity className="w-3 h-3 text-emerald-600" />
-                        {Math.round(incident.confidence * 100)}%
-                        <span className="text-[10px] font-normal text-slate-500">
-                          (YOLOv8)
+                    {/* Compact info rows — no heavy boxes, just clean spacing + divider */}
+                    <div className="space-y-1.5 py-2 border-y border-slate-100">
+                      <div className="flex items-center justify-between text-[11.5px]">
+                        <span className="flex items-center gap-1.5 text-slate-500">
+                          <Activity className="w-3.5 h-3.5 text-emerald-600" />
+                          AI Confidence
+                        </span>
+                        <span className="font-bold text-slate-800">
+                          {Math.round(incident.confidence * 100)}%
+                          <span className="font-normal text-slate-400 ml-1">YOLOv8</span>
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between text-[11.5px]">
+                        <span className="flex items-center gap-1.5 text-slate-500">
+                          <Bus className="w-3.5 h-3.5 text-indigo-600" />
+                          Bus Sensor
+                        </span>
+                        <span className="font-bold text-slate-800">{incident.bus_id}</span>
+                      </div>
+
+                      <div className="flex items-center justify-between text-[11.5px]">
+                        <span className="flex items-center gap-1.5 text-slate-500">
+                          <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                          Detected
+                        </span>
+                        <span className="font-medium text-slate-700 text-[11px]">
+                          {formatDateTime(incident.timestamp)}
                         </span>
                       </div>
                     </div>
 
-                    <div>
-                      <span className="text-slate-500 block text-[10px] uppercase font-semibold">
-                        Bus Sensor
-                      </span>
-                      <div className="flex items-center gap-1 mt-0.5 font-bold text-slate-800">
-                        <Bus className="w-3 h-3 text-indigo-600" />
-                        {incident.bus_id}
+                    {/* Plate number, if applicable */}
+                    {incident.plate_number && (
+                      <div className="mt-2 flex items-center justify-between text-[11px] bg-rose-50 px-2 py-1.5 rounded-md">
+                        <span className="font-semibold text-rose-800">Plate (OCR)</span>
+                        <span className="font-mono font-bold text-rose-900 bg-white px-1.5 py-0.5 rounded border border-rose-200">
+                          {incident.plate_number}
+                        </span>
                       </div>
-                    </div>
+                    )}
 
-                    <div className="col-span-2 pt-1 border-t border-slate-200/80">
-                      <span className="text-slate-500 block text-[10px] uppercase font-semibold">
-                        Detection Timestamp
-                      </span>
-                      <div className="flex items-center gap-1 mt-0.5 text-slate-700">
-                        <Calendar className="w-3 h-3 text-slate-400" />
-                        {formatDateTime(incident.timestamp)}
-                      </div>
-                    </div>
-                  </div>
+                    {/* View Photo button */}
+                    <button
+                      type="button"
+                      onClick={() => setPhotoIncident(incident)}
+                      className="mt-2.5 w-full flex items-center justify-center gap-1.5 text-[11.5px] font-semibold text-white py-1.5 rounded-md transition-opacity hover:opacity-90"
+                      style={{ backgroundColor: config.color }}
+                    >
+                      <ImageIcon className="w-3.5 h-3.5" />
+                      View Photo
+                    </button>
 
-                  {/* Hit and Run Plate Number display (only when applicable) */}
-                  {incident.plate_number && (
-                    <div className="mb-2 p-1.5 bg-rose-50 border border-rose-200 rounded text-[11px] flex items-center justify-between">
-                      <span className="font-semibold text-rose-800">Plate (OCR):</span>
-                      <span className="font-mono font-bold text-rose-900 bg-white px-1.5 py-0.5 rounded border border-rose-300">
-                        {incident.plate_number}
-                      </span>
+                    {/* GPS footer */}
+                    <div className="mt-2 flex justify-between text-[10px] text-slate-400 font-mono">
+                      <span>{incident.latitude.toFixed(4)}, {incident.longitude.toFixed(4)}</span>
                     </div>
-                  )}
-
-                  {/* GPS Coordinates */}
-                  <div className="text-[10px] text-slate-600 flex justify-between font-mono bg-white px-1 py-0.5 rounded border border-slate-200">
-                    <span>Lat: {incident.latitude.toFixed(4)}</span>
-                    <span>Lng: {incident.longitude.toFixed(4)}</span>
                   </div>
                 </div>
               </Popup>
@@ -268,7 +271,7 @@ export const IncidentMap: React.FC<IncidentMapProps> = ({
       </MapContainer>
 
       {/* Floating Map Legend */}
-      <div 
+      <div
         id="map-legend"
         className="absolute bottom-5 right-4 z-[400] bg-white/95 backdrop-blur-xs border border-slate-200 rounded-lg p-3 shadow-md max-w-xs text-xs"
       >
@@ -294,6 +297,50 @@ export const IncidentMap: React.FC<IncidentMapProps> = ({
           <span className="font-semibold text-emerald-700">Live GIS</span>
         </div>
       </div>
+
+      {/* Photo Viewer Modal */}
+      {photoIncident && (
+        <div
+          className="fixed inset-0 z-[1000] bg-black/70 flex items-center justify-center p-4"
+          onClick={() => setPhotoIncident(null)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+              <span className="text-sm font-semibold text-slate-800">
+                {(EVENT_TYPE_CONFIG[photoIncident.event_type]?.label) || photoIncident.event_type} — Detection Snapshot
+              </span>
+              <button
+                type="button"
+                onClick={() => setPhotoIncident(null)}
+                className="text-slate-400 hover:text-slate-700 transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="bg-slate-100 flex items-center justify-center min-h-[280px]">
+              {(photoIncident as any).image_url ? (
+                <img
+                  src={(photoIncident as any).image_url}
+                  alt="Detection snapshot"
+                  className="w-full h-auto max-h-[420px] object-contain"
+                />
+              ) : (
+                <div className="text-center text-slate-400 py-16 px-6">
+                  <ImageIcon className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-xs">No snapshot available for this event yet</p>
+                </div>
+              )}
+            </div>
+            <div className="px-4 py-2.5 text-[11px] text-slate-500 bg-slate-50 border-t border-slate-100">
+              {photoIncident.bus_id} · {formatDateTime(photoIncident.timestamp)}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
