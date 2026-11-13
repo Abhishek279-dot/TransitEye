@@ -1,23 +1,41 @@
-# Node
-node_modules/
-Frontend/node_modules/
 
-# Build
+# Node.js
+node_modules/
+**/node_modules/
+
+# Build files
 build/
 dist/
 coverage/
 
-# Python
+# Python virtual environments
+venv/
+**/venv/
+.venv/
+**/.venv/
+
+# Python cache
 **/__pycache__/
 **/*.pyc
-backend/venv/
+
+# Detection model generated outputs
+Detection_Model/runs/
+*.avi
+
+# Large input videos (keep locally, don't upload)
+*.mp4
+
+# Archives
+*.zip
+
+# Environment variables
+.env
+.env.*
+!.env.example
 
 # OS
 .DS_Store
+Thumbs.db
 
 # Logs
 *.log
-
-# Environment variables
-.env*
-!.env.example
